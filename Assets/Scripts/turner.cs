@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class turner : MonoBehaviour
 {
@@ -19,11 +20,16 @@ public class turner : MonoBehaviour
     public GameObject sleepUI;
     public GameObject factoryUI;
     public GameObject shopUI;
+    public GameObject statsUI;
     [Header("Stats")]
     public float energy = 100f;
     public float purity = 100f;
     public int money = 0;
     public Text moneyText;
+    [Header("Bars")]
+    public Text energyText;
+    public Text purityText;
+
     [Header("Food Inventory")]
     public int plovCounter = 0;
     public int proteinCounter = 0;
@@ -42,17 +48,34 @@ public class turner : MonoBehaviour
     {
         energy = 100f;
         purity = 100f;
+        money = PlayerPrefs.GetInt("SavedMoney", 0);
+        energy = PlayerPrefs.GetFloat("SavedEnergy", 0f);
+        purity = PlayerPrefs.GetFloat("SavedPurity", 0f);
+        plovCounter = PlayerPrefs.GetInt("SavedPlov", 0);
+        proteinCounter = PlayerPrefs.GetInt("SavedProtein", 0);
+        milkCounter = PlayerPrefs.GetInt("SavedMilk", 0);
+
         UpdateUI();
     }
-
-    void UpdateUI()
+    public void UpdateUI()
     {
-        if (moneyText != null) moneyText.text = money.ToString();
+        if (moneyText != null) moneyText.text = money.ToString() + "$";
         if (plovText != null) plovText.text = plovCounter.ToString();
         if (proteinText != null) proteinText.text = proteinCounter.ToString();
         if (milkText != null) milkText.text = milkCounter.ToString();
+        if (energyText != null) energyText.text = energy.ToString() + "/100";
+        if (purityText != null) purityText.text = purity.ToString() + "/100";
+
+        PlayerPrefs.SetInt("SavedMoney", money);
+        PlayerPrefs.SetFloat("SavedEnergy", energy);
+        PlayerPrefs.SetFloat("SavedPurity", purity);
+        PlayerPrefs.SetInt("SavedPlov", plovCounter);
+        PlayerPrefs.SetInt("SavedProtein", proteinCounter);
+        PlayerPrefs.SetInt("SavedMilk", milkCounter);
+
+        PlayerPrefs.Save();
     }
-    
+
     //BUTTONS
     public void OnProteinEating()
     {
@@ -110,9 +133,7 @@ public class turner : MonoBehaviour
     public void OnDiscipline()
     {
         energy += 1f;
-        purity -= 1f;
         energy = Mathf.Clamp(energy, 0, 100);
-        purity = Mathf.Clamp(purity, 0, 100);
         UpdateUI();
     }
     public void OnFactoryWork()
@@ -142,8 +163,8 @@ public class turner : MonoBehaviour
     public void BuyFood(string itemName)
     {
         if (itemName == "plov" && money >= plovPrice) { money -= plovPrice; plovCounter++; }
-        else if (itemName == "protein" && money >= proteinPrice) { money -= proteinPrice; plovCounter++; }
-        else if (itemName == "milk" && money >= milkPrice) { money -= milkPrice; plovCounter++; }
+        else if (itemName == "protein" && money >= proteinPrice) { money -= proteinPrice; proteinCounter++; }
+        else if (itemName == "milk" && money >= milkPrice) { money -= milkPrice; milkCounter++; }
         else { Debug.Log("ИДИ НА ЗАВОД НИЩЕТА😭😭"); return; }
         UpdateUI();
     }
@@ -156,6 +177,8 @@ public class turner : MonoBehaviour
         sleepUI.SetActive(false);
         factoryUI.SetActive(false);
         shopUI.SetActive(false);
+        statsUI.SetActive(true);
+
 
         switch (roomName.ToLower())
         {
@@ -180,7 +203,11 @@ public class turner : MonoBehaviour
                 factoryUI.SetActive(true);
                 break;
             case "shop":
+                statsUI.SetActive(false);
                 shopUI.SetActive(true);
+                break;
+            case "xxl":
+                SceneManager.LoadScene("XXL");
                 break;
         }
     }
