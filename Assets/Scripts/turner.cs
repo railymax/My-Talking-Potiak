@@ -18,11 +18,24 @@ public class turner : MonoBehaviour
     public GameObject bathUI;
     public GameObject sleepUI;
     public GameObject factoryUI;
+    public GameObject shopUI;
     [Header("Stats")]
     public float energy = 100f;
     public float purity = 100f;
     public int money = 0;
     public Text moneyText;
+    [Header("Food Inventory")]
+    public int plovCounter = 0;
+    public int proteinCounter = 0;
+    public int milkCounter = 0;
+    [Header("Food Prices")]
+    public int plovPrice = 5;
+    public int proteinPrice = 15;
+    public int milkPrice = 10;
+    [Header("Food Texts")]
+    public Text plovText;
+    public Text proteinText;
+    public Text milkText;
 
     //Start
     public void Start()
@@ -35,31 +48,40 @@ public class turner : MonoBehaviour
     void UpdateUI()
     {
         if (moneyText != null) moneyText.text = money.ToString();
+        if (plovText != null) plovText.text = plovCounter.ToString();
+        if (proteinText != null) proteinText.text = proteinCounter.ToString();
+        if (milkText != null) milkText.text = milkCounter.ToString();
     }
     
     //BUTTONS
     public void OnProteinEating()
     {
-        energy += 10f;
-        energy = Mathf.Clamp(energy, 0, 100);
-        purity = Mathf.Clamp(purity, 0, 100);
-        Debug.Log("Скушал протеин, радостно");
+        if (proteinCounter > 0)
+        {
+            proteinCounter--;
+            energy += 10f;
+            energy = Mathf.Clamp(energy, 0, 100);
+        }
         UpdateUI();
     }
     public void OnTestEating()
     {
-        energy += 50f;
-        energy = Mathf.Clamp(energy, 0, 100);
-        purity = Mathf.Clamp(purity, 0, 100);
-        Debug.Log("Укололся тестом");
+        if (plovCounter > 0)
+        {
+            plovCounter--;
+            energy += 50f;
+            energy = Mathf.Clamp(energy, 0, 100);
+        }
         UpdateUI();
     }
     public void OnMilkDrinking()
     {
-        energy += 15f;
-        energy = Mathf.Clamp(energy, 0, 100);
-        purity = Mathf.Clamp(purity, 0, 100);
-        Debug.Log("Выпил молочка, вайб");
+        if (milkCounter > 0)
+        {
+            milkCounter--;
+            energy += 15f;
+            energy = Mathf.Clamp(energy, 0, 100);
+        }
         UpdateUI();
     }
     public void OnShowerUsing()
@@ -70,12 +92,7 @@ public class turner : MonoBehaviour
             purity += 25f;
             energy = Mathf.Clamp(energy, 0, 100);
             purity = Mathf.Clamp(purity, 0, 100);
-            Debug.Log("Отмыл грязь после завода");
             UpdateUI();
-        }
-        else
-        {
-            Debug.Log("Недостаточно энергии, сходи поешь");
         }
 
     }
@@ -87,12 +104,7 @@ public class turner : MonoBehaviour
             purity += 10f;
             energy = Mathf.Clamp(energy, 0, 100);
             purity = Mathf.Clamp(purity, 0, 100);
-            Debug.Log("Отмыл грязь под ногтями");
             UpdateUI();
-        }
-        else
-        {
-            Debug.Log("Недостаточно энергии, сходи поешь");
         }
     }
     public void OnDiscipline()
@@ -101,7 +113,6 @@ public class turner : MonoBehaviour
         purity -= 1f;
         energy = Mathf.Clamp(energy, 0, 100);
         purity = Mathf.Clamp(purity, 0, 100);
-        Debug.Log("ТИХО! ПОТЯК ДЕЛАЕТ ДИСЦИПЛИНУ😈😈😈");
         UpdateUI();
     }
     public void OnFactoryWork()
@@ -113,7 +124,6 @@ public class turner : MonoBehaviour
             money += 10;
             energy = Mathf.Clamp(energy, 0, 100);
             purity = Mathf.Clamp(purity, 0, 100);
-            Debug.Log("ПОТЯК РАБОТАЕТ ЗА КОПЕЙКИ🤑🤑🤑");
         }
         else
         {
@@ -128,7 +138,15 @@ public class turner : MonoBehaviour
         }
         UpdateUI();
     }
-
+    //Food
+    public void BuyFood(string itemName)
+    {
+        if (itemName == "plov" && money >= plovPrice) { money -= plovPrice; plovCounter++; }
+        else if (itemName == "protein" && money >= proteinPrice) { money -= proteinPrice; plovCounter++; }
+        else if (itemName == "milk" && money >= milkPrice) { money -= milkPrice; plovCounter++; }
+        else { Debug.Log("ИДИ НА ЗАВОД НИЩЕТА😭😭"); return; }
+        UpdateUI();
+    }
     //BgColor
     public void SetBackgroundColor(string roomName)
     {
@@ -137,6 +155,7 @@ public class turner : MonoBehaviour
         bathUI.SetActive(false);
         sleepUI.SetActive(false);
         factoryUI.SetActive(false);
+        shopUI.SetActive(false);
 
         switch (roomName.ToLower())
         {
@@ -159,6 +178,9 @@ public class turner : MonoBehaviour
             case "factory":
                 backgroundImage.sprite = factoryRoomSprite;
                 factoryUI.SetActive(true);
+                break;
+            case "shop":
+                shopUI.SetActive(true);
                 break;
         }
     }
