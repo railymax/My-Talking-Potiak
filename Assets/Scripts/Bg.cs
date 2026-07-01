@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Bg : MonoBehaviour
+public class turner : MonoBehaviour
 {
     public Image backgroundImage;
     public Color gameRoomcolor = Color.gray;
@@ -32,6 +32,10 @@ public class Bg : MonoBehaviour
                 backgroundImage.color = factoryRoomcolor;
                 break;
         }
+    }
+    public void HitPotiak()
+    {
+        Debug.Log("НА СУКА!😈😈😈");
     }
 }
 
